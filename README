@@ -1,0 +1,129 @@
+
+Notes from Christian Kreibich:
+
+This is a standalone version of Richard Stevens' "sock" program, based
+on the code available for the UNIX Network Programming book, at:
+
+  http://www.kohala.com/start/unpv12e.html
+
+I found this version at
+
+  http://ttcplinux.sourceforge.net/tools/tools.html
+
+and cleaned up the tarball a bit. To make sock a little easier to
+find, I'm now hosting it on a dedicated webpage:
+
+  http://www.icir.org/christian/sock.html
+
+I will implement minor updates to the code when I feel they make sense
+for reasons of clarity or educational value, but I won't make any other
+changes (such as additional features or similar).
+
+I'm happy to incorporate build fixes where feasible and necessary, but
+I do not give build support etc.
+
+						Enjoy,
+						Christian
+
+Notes from Steve Jacobson:
+
+This FreeBSD port is built on top of the original 0.3.2 tarball from
+2010, above, downloaded from the icir.org webpage.
+
+Version 0.4.0 notes:
+
+The version of this sock program has been updated to 0.4.0 to reflect
+the IPv6 changes.  This version also includes a run-time version option
+and better documentation.
+
+The sock program can generate various UDP and TCP packets with various
+options.  It can also be run as a client or as a server.
+
+Beyond educational uses, this program can be used in many different
+networking contexts to generate test packets.
+
+In addition to the previously existing capabilities of "sock," this port
+has an IPv6 option that allows TCP or UDP to be sent over IPv6, or over
+the default IPv4.
+
+This port also fixes a couple of bugs in Christian Kreibich's version;
+fixes are documented in the source code.
+
+Testing with this program shows that a number of socket options that
+are supported for IPv4 are not supported for IPv6.  it is unclear if
+anyone is concerned about this in practice.
+
+This port was tested on FreeBSD 8.4, i386; and, FreeBSD 10.2, amd64.
+
+The license is generic educational on all the source files.  Only one
+file mentions "GPL"; that is sock.spec, the RPM spec file, which was
+added later by a Linux person.  The FreeBSD port should not need that
+file.
+
+Version 0.4.1 notes:
+
+The version has been updated to 0.4.1 to reflect the SCTP changes.
+
+SCTP can now be chosen as a layer 4 protocol, as an alternative to
+UDP and the default TCP.
+
+This port was tested on FreeBSD 8.4, i386; and, FreeBSD 10.2, amd64.
+
+
+Build and installation notes:
+
+David Morgan of the Computer Science Department at Santa Monica College
+has concise instructions on how to build, install and use sock.  Some
+of the following instructions are excerpted from his web page:
+
+  http://homepage.smc.edu/morgan_david/cs75/labs/stevens-sock.htm
+
+To configure and compile sock:
+
+  cd sock
+  ./configure
+  make
+
+(Optional) to install sock:
+
+  make install
+
+To do a basic clean of the directory:
+
+  make clean
+
+To fully clean the directory:
+
+  make distclean
+
+
+Build issues:
+
+These build issues were noted on FreeBSD 8.4
+
+1.  make fails with the following error:
+
+    aclocal-1.11: not found
+    *** Error code 127
+
+    Issue:  This indicates that the access date on file configure.in
+    is too new relative to certain other files.
+
+    Fix:  
+      cd sock
+      touch *
+
+2.  make fails with the following error:
+
+    In file included from ./sock.h:31,
+                 from buffers.c:11:
+
+    /usr/include/netdb.h:127: error: redefinition of 'struct addrinfo'
+    *** Error code 1
+
+    Issue:  This occurs if config.h exists in the src directory
+
+    Fix:
+      cd sock/src
+      rm config.h
+
