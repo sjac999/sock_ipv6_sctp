@@ -30,17 +30,19 @@ sockopts(int sockfd, int doall)
 	unsigned	optlen;
 	struct linger	ling;
 	struct timeval	timer;
-	int 		level;
+	int 		l3_prot;
 
 	if (AF_INET == af_46) {
-		level = IPPROTO_IP;
+		l3_prot = IPPROTO_IP;
 	} else {
-		level = IPPROTO_IPV6;
+		l3_prot = IPPROTO_IPV6;
 	}
 	
-	/* "doall" is 0 for a server's listening socket (i.e., before
-	   accept() has returned.)  Some socket options such as SO_KEEPALIVE
-	   don't make sense at this point, while others like SO_DEBUG do. */
+	/*
+	 * "doall" is 0 for a server's listening socket (i.e., before
+	 * accept() has returned.)  Some socket options such as SO_KEEPALIVE
+	 * don't make sense at this point, while others like SO_DEBUG do.
+	 */
 	
 	if (debug) {
 		option = 1;
@@ -80,13 +82,13 @@ sockopts(int sockfd, int doall)
 	
 #ifdef	IP_TOS
 	if (iptos != -1 && doall == 0) {
-		if (setsockopt(sockfd, level, IP_TOS,
+		if (setsockopt(sockfd, l3_prot, IP_TOS,
 			       &iptos, sizeof(iptos)) < 0)
 			err_sys("IP_TOS setsockopt error");
 		
 		option = 0;
 		optlen = sizeof(option);
-		if (getsockopt(sockfd, level, IP_TOS,
+		if (getsockopt(sockfd, l3_prot, IP_TOS,
 			       &option, &optlen) < 0)
 			err_sys("IP_TOS getsockopt error");
 		if (option != iptos)
@@ -99,20 +101,49 @@ sockopts(int sockfd, int doall)
 	
 #ifdef	IP_TTL
 	if (ipttl != -1 && doall == 0) {
-		if (setsockopt(sockfd, level, IP_TTL,
-			       &ipttl, sizeof(ipttl)) < 0)
-			err_sys("IP_TTL setsockopt error");
-		
-		option = 0;
-		optlen = sizeof(option);
-		if (getsockopt(sockfd, level, IP_TTL,
-			       &option, &optlen) < 0)
-			err_sys("IP_TTL getsockopt error");
-		if (option != ipttl)
-			err_quit("IP_TTL not set (%d)", option);
-		
-		if (verbose)
-			fprintf(stderr, "IP_TTL set to %d\n", ipttl);
+		if (IPPROTO_IP == l3_prot) {
+			/* Set IPv4 TTL */
+			if (setsockopt(sockfd, l3_prot, IP_TTL,
+				    &ipttl, sizeof(ipttl)) < 0) {
+				err_sys("IPv4 IP_TTL setsockopt error");
+			}
+			option = 0;
+			optlen = sizeof(option);
+			if (getsockopt(sockfd, l3_prot, IP_TTL,
+				    &option, &optlen) < 0) {
+				err_sys("IPv4 IP_TTL getsockopt error");
+			}
+			if (option != ipttl) {
+				err_quit("IPv4 IP_TTL not set (%d)", option);
+			}
+			if (verbose) {
+				fprintf(stderr, "IPv4 IP_TTL set to %d\n",
+				    ipttl);
+			}
+		} else {
+			/* Set IPv6 hop limit */
+			if (setsockopt(sockfd, l3_prot, IPV6_UNICAST_HOPS,
+				    &ipttl, sizeof(ipttl)) < 0) {
+				err_sys(
+				    "IPv6 IPV6_UNICAST_HOPS setsockopt error");
+			}
+			option = 0;
+			optlen = sizeof(option);
+			if (getsockopt(sockfd, l3_prot, IPV6_UNICAST_HOPS,
+				    &option, &optlen) < 0) {
+				err_sys(
+				    "IPv6 IPV6_UNICAST_HOPS getsockopt error");
+			}
+			if (option != ipttl) {
+				err_quit("IPv6 IPV6_UNICAST_HOPS not set (%d)",
+				    option);
+			}
+			if (verbose) {
+				fprintf(stderr,
+				    "IPv6 IPV6_UNICAST_HOPS set to %d\n",
+				    ipttl);
+			}
+		}
 	}
 #endif
     
@@ -157,13 +188,13 @@ sockopts(int sockfd, int doall)
 #ifdef	IP_ONESBCAST
 		if (onesbcast) {
 			option = 1;
-			if (setsockopt(sockfd, level, IP_ONESBCAST,
+			if (setsockopt(sockfd, l3_prot, IP_ONESBCAST,
 				       &option, sizeof(option)) < 0)
 				err_sys("IP_ONESBCAST setsockopt error");
 			
 			option = 0;
 			optlen = sizeof(option);
-			if (getsockopt(sockfd, level, IP_ONESBCAST,
+			if (getsockopt(sockfd, l3_prot, IP_ONESBCAST,
 				       &option, &optlen) < 0)
 				err_sys("IP_ONESBCAST getsockopt error");
 			if (option == 0)
@@ -182,7 +213,7 @@ sockopts(int sockfd, int doall)
 		if (inet_aton(joinip, &join.imr_multiaddr) == 0)
 			err_quit("invalid multicast address: %s", joinip);
 		join.imr_interface.s_addr = htonl(INADDR_ANY);
-		if (setsockopt(sockfd, level, IP_ADD_MEMBERSHIP,
+		if (setsockopt(sockfd, l3_prot, IP_ADD_MEMBERSHIP,
 			       &join, sizeof(join)) < 0)
 			err_sys("IP_ADD_MEMBERSHIP setsockopt error");
 		
@@ -195,12 +226,12 @@ sockopts(int sockfd, int doall)
 	if (mcastttl) {
 		u_char	ttl = mcastttl;
 		
-		if (setsockopt(sockfd, level, IP_MULTICAST_TTL,
+		if (setsockopt(sockfd, l3_prot, IP_MULTICAST_TTL,
 			       &ttl, sizeof(ttl)) < 0)
 			err_sys("IP_MULTICAST_TTL setsockopt error");
 		
 		optlen = sizeof(ttl);
-		if (getsockopt(sockfd, level, IP_MULTICAST_TTL,
+		if (getsockopt(sockfd, l3_prot, IP_MULTICAST_TTL,
 			       &ttl, &optlen) < 0)
 			err_sys("IP_MULTICAST_TTL getsockopt error");
 		if (ttl != mcastttl)
@@ -329,13 +360,13 @@ sockopts(int sockfd, int doall)
 	if (recvdstaddr && l4_prot == L4_PROT_UDP) {
 #ifdef	IP_RECVDSTADDR
 		option = 1;
-		if (setsockopt(sockfd, level, IP_RECVDSTADDR,
+		if (setsockopt(sockfd, l3_prot, IP_RECVDSTADDR,
 			       &option, sizeof(option)) < 0)
 			err_sys("IP_RECVDSTADDR setsockopt error");
 		
 		option = 0;
 		optlen = sizeof(option);
-		if (getsockopt(sockfd, level, IP_RECVDSTADDR,
+		if (getsockopt(sockfd, l3_prot, IP_RECVDSTADDR,
 			       &option, &optlen) < 0)
 			err_sys("IP_RECVDSTADDR getsockopt error");
 		if (option == 0)

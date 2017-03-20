@@ -444,7 +444,7 @@ usage(const char *msg)
 #endif
 "         -I    SIGIO signal\n"
 #ifdef	IP_TTL
-"         -J n  IP_TTL option\n"
+"         -J n  IPv4 TTL/IPv6 hop limit option\n"
 #endif
 "         -K    SO_KEEPALIVE option\n"
 "         -L n  SO_LINGER option, n = linger time\n"
