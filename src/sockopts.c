@@ -224,21 +224,47 @@ sockopts(int sockfd, int doall)
 	
 #ifdef	IP_MULTICAST_TTL
 	if (mcastttl) {
-		u_char	ttl = mcastttl;
+		if (IPPROTO_IP == l3_prot) {
+			u_char	ttl = mcastttl;
 		
-		if (setsockopt(sockfd, l3_prot, IP_MULTICAST_TTL,
-			       &ttl, sizeof(ttl)) < 0)
-			err_sys("IP_MULTICAST_TTL setsockopt error");
-		
-		optlen = sizeof(ttl);
-		if (getsockopt(sockfd, l3_prot, IP_MULTICAST_TTL,
-			       &ttl, &optlen) < 0)
-			err_sys("IP_MULTICAST_TTL getsockopt error");
-		if (ttl != mcastttl)
-			err_quit("IP_MULTICAST_TTL not set (%d)", ttl);
-		
-		if (verbose)
-			fprintf(stderr, "IP_MULTICAST_TTL set to %d\n", ttl);
+			if (setsockopt(sockfd, l3_prot, IP_MULTICAST_TTL,
+				       &ttl, sizeof(ttl)) < 0) {
+				err_sys("IP_MULTICAST_TTL setsockopt error");
+			}
+			optlen = sizeof(ttl);
+			if (getsockopt(sockfd, l3_prot, IP_MULTICAST_TTL,
+				       &ttl, &optlen) < 0) {
+				err_sys("IP_MULTICAST_TTL getsockopt error");
+			}
+			if (ttl != mcastttl) {
+				err_quit("IP_MULTICAST_TTL not set (%d)", ttl);
+			}
+			if (verbose) {
+				fprintf(stderr,
+				    "IP_MULTICAST_TTL set to %d\n", ttl);
+			}
+		} else {
+			// Fixme:  Should this be a char, as above?
+			int	ttl = mcastttl;
+
+			if (setsockopt(sockfd, l3_prot, IPV6_MULTICAST_HOPS,
+				       (char *)&ttl, sizeof(ttl)) < 0) {
+				err_sys("IPV6_MULTICAST_HOPS setsockopt error");
+			}
+			optlen = sizeof(ttl);
+			if (getsockopt(sockfd, l3_prot, IPV6_MULTICAST_HOPS,
+				       (char *)&ttl, &optlen) < 0) {
+				err_sys("IPV6_MULTICAST_HOPS getsockopt error");
+			}
+			if (ttl != mcastttl) {
+				err_quit("IPV6_MULTICAST_HOPS not set (%d)",
+				    ttl);
+			}
+			if (verbose) {
+				fprintf(stderr,
+				    "IPV6_MULTICAST_HOPS set to %d\n", ttl);
+			}
+		}
 	}
 #endif
 	

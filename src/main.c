@@ -40,8 +40,8 @@ char		foreignip[32];			/* foreign IP address, dotted-decimal string */
 int		foreignport;			/* foreign port number */
 int		halfclose;			/* TCP half close option */
 int		ignorewerr;			/* true if write() errors should be ignored */
-int		iptos = -1;			/* IP_TOS opton */
-int		ipttl = -1;			/* IP_TTL opton */
+int		iptos = -1;			/* IP_TOS option */
+int		ipttl = -1;			/* IP_TTL option */
 char		joinip[32];			/* multicast IP address, dotted-decimal string */
 int		keepalive;			/* SO_KEEPALIVE */
 long		linger = -1;			/* 0 or positive turns on option */
@@ -425,7 +425,7 @@ usage(const char *msg)
 "         -r n  #bytes per read() for \"sink\" server (default 1024)\n"
 "         -s    operate as server instead of client\n"
 #ifdef	IP_MULTICAST_TTL
-"         -t n  set multicast ttl\n"
+"         -t n  set IPv4 multicast TTL/IPv6 multicast hop limit\n"
 #endif
 "         -u    use UDP instead of TCP or SCTP\n"
 "         -v    verbose\n"
@@ -444,7 +444,7 @@ usage(const char *msg)
 #endif
 "         -I    SIGIO signal\n"
 #ifdef	IP_TTL
-"         -J n  IPv4 TTL/IPv6 hop limit option\n"
+"         -J n  set IPv4 TTL/IPv6 hop limit\n"
 #endif
 "         -K    SO_KEEPALIVE option\n"
 "         -L n  SO_LINGER option, n = linger time\n"
