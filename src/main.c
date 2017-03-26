@@ -41,8 +41,8 @@ char		foreignip[32];			/* foreign IP address, dotted-decimal string */
 int		foreignport;			/* foreign port number */
 int		halfclose;			/* TCP half close option */
 int		ignorewerr;			/* true if write() errors should be ignored */
-int		iptos = -1;			/* IP_TOS option */
-int		ipttl = -1;			/* IP_TTL option */
+int		iptos = -1;			/* IP_TOS/IPV6_TCLASS option */
+int		ipttl = -1;			/* IP_TTL/IPV6_MULTICAST_HOPS option */
 char		joinip[32];			/* multicast IP address, dotted-decimal string */
 int		keepalive;			/* SO_KEEPALIVE */
 long		linger = -1;			/* 0 or positive turns on option */
@@ -248,8 +248,9 @@ main(int argc, char *argv[])
 			break;
 
 #ifdef	IP_TOS
-		case 'H':			/* IP_TOS socket option */
-			iptos = atoi(optarg);
+		case 'H':			/* IP_TOS/IPV6_TCLASS option */
+			/* Accepts "n" (decimal) or "0xn" (hex). */
+			iptos = (int)strtol(optarg, (char **)NULL, 0);
 			break;
 #endif
 
@@ -452,7 +453,8 @@ usage(const char *msg)
 "         -F    fork after connection accepted (TCP concurrent server)\n"
 "         -G a.b.c.d  strict source route\n"
 #ifdef	IP_TOS
-"         -H n  IP_TOS option (16=min del, 8=max thru, 4=max rel, 2=min$)\n"
+"         -H n  IPv4:  set TOS (DSCP/ECN) to n (decimal) or 0xn (hex)\n"
+"               IPv6:  set traffic class to n (decimal) or 0xn (hex)\n"
 #endif
 "         -I    SIGIO signal\n"
 #ifdef	IP_TTL

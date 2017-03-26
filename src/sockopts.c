@@ -82,20 +82,45 @@ sockopts(int sockfd, int doall)
 	
 #ifdef	IP_TOS
 	if (iptos != -1 && doall == 0) {
-		if (setsockopt(sockfd, l3_prot, IP_TOS,
-			       &iptos, sizeof(iptos)) < 0)
-			err_sys("IP_TOS setsockopt error");
-		
-		option = 0;
-		optlen = sizeof(option);
-		if (getsockopt(sockfd, l3_prot, IP_TOS,
-			       &option, &optlen) < 0)
-			err_sys("IP_TOS getsockopt error");
-		if (option != iptos)
-			err_quit("IP_TOS not set (%d)", option);
-		
-		if (verbose)
-			fprintf(stderr, "IP_TOS set to %d\n", iptos);
+		if (IPPROTO_IP == l3_prot) {
+			if (setsockopt(sockfd, l3_prot, IP_TOS,
+				    &iptos, sizeof(iptos)) < 0) {
+				err_sys("IP_TOS setsockopt error");
+			}
+			option = 0;
+			optlen = sizeof(option);
+			if (getsockopt(sockfd, l3_prot, IP_TOS,
+				    &option, &optlen) < 0) {
+				err_sys("IP_TOS getsockopt error");
+			}
+			if (option != iptos) {
+				err_quit("IP_TOS not set (0x%02x, 0x%02x)",
+				    iptos, option);
+			}
+			if (verbose) {
+				fprintf(stderr, "IP_TOS set to 0x%02x\n",
+				    iptos);
+			}
+		} else {
+			if (setsockopt(sockfd, l3_prot, IPV6_TCLASS,
+				    (char *)&iptos, sizeof(iptos)) < 0) {
+				err_sys("IPv6 IPV6_TCLASS setsockopt error");
+			}
+			option = 0;
+			optlen = sizeof(option);
+			if (getsockopt(sockfd, l3_prot, IPV6_TCLASS,
+				    &option, &optlen) < 0) {
+				err_sys("IPV6_TCLASS getsockopt error");
+			}
+			if (option != iptos) {
+				err_quit("IPV6_TCLASS not set (0x%02x, 0x%02x)",
+				    iptos, option);
+			}
+			if (verbose) {
+				fprintf(stderr, "IPV6_TCLASS set to 0x%02x\n",
+				    iptos);
+			}
+		}
 	}
 #endif
 	

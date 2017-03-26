@@ -1,6 +1,6 @@
 Summary: Richard Stevens Sock
 Name: sock
-Version: 0.4.1.4
+Version: 0.4.1.5
 Release: 1
 Epoch: 0
 License: GPL
