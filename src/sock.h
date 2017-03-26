@@ -81,6 +81,7 @@ extern int		crlf;
 extern int		debug;
 extern int		dofork;
 extern int		dontroute;
+extern int		flowlabel_option;
 extern char		foreignip[];
 extern int		foreignport;
 extern int		halfclose;

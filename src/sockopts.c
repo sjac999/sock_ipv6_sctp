@@ -146,11 +146,39 @@ sockopts(int sockfd, int doall)
 		}
 	}
 #endif
+
+	if ((-1 != flowlabel_option) && (AF_INET6 == af_46)) {
+		/*
+		 * Enable or disable IPv6 header flow label
+		 * Note:  Flow label is enabled by default in FreeBSD 8.4/10.2
+		 */
+		if (setsockopt(sockfd, l3_prot, IPV6_AUTOFLOWLABEL,
+		    (char *)&flowlabel_option, sizeof(flowlabel_option)) < 0) {
+			err_sys("IPv6 IPV6_AUTOFLOWLABEL setsockopt error");
+		}
+		option = 0;
+		optlen = sizeof(option);
+		if (getsockopt(sockfd, l3_prot, IPV6_AUTOFLOWLABEL,
+		    &option, &optlen) < 0) {
+			err_sys("IPv6 IPV6_AUTOFLOWLABEL getsockopt error");
+		}
+		if (option != flowlabel_option) {
+			err_quit("IPv6 IPV6_AUTOFLOWLABEL not set (%d)",
+			    option);
+		}
+		if (verbose) {
+			fprintf(stderr,
+			    "IPv6 IPV6_AUTOFLOWLABEL set to %d\n",
+			    option);
+		}
+	}
     
 	if (maxseg && l4_prot == L4_PROT_TCP) {
-		/* Need to set MSS for server before connection established */
-		/* Beware: some kernels do not let the process set this socket
-		   option; others only let it be decreased. */
+		/*
+		 * Need to set MSS for server before connection established
+		 * Beware: some kernels do not let the process set this socket
+		 * option; others only let it be decreased.
+		 */
 		if (setsockopt(sockfd, IPPROTO_TCP, TCP_MAXSEG,
 			       &maxseg, sizeof(maxseg)) < 0)
 			err_sys("TCP_MAXSEG setsockopt error");

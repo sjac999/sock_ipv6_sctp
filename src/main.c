@@ -36,6 +36,7 @@ int		crlf;				/* convert newline to CR/LF & vice versa */
 int		debug;				/* SO_DEBUG */
 int		dofork;				/* concurrent server, do a fork() */
 int		dontroute;			/* SO_DONTROUTE */
+int		flowlabel_option = -1;		/* IPv6 flow label option */
 char		foreignip[32];			/* foreign IP address, dotted-decimal string */
 int		foreignport;			/* foreign port number */
 int		halfclose;			/* TCP half close option */
@@ -93,7 +94,7 @@ main(int argc, char *argv[])
 		usage("");
 
 	opterr = 0;		/* don't want getopt() writing to stderr */
-	while ( (c = getopt(argc, argv, "0256b:cf:g:hij:kl:n:op:q:r:st:uvw:x:y:ABCDEFG:H:IJ:KL:NO:P:Q:R:S:TU:VWX:YZ")) != -1) {
+	while ( (c = getopt(argc, argv, "0256b:ce:f:g:hij:kl:n:op:q:r:st:uvw:x:y:ABCDEFG:H:IJ:KL:NO:P:Q:R:S:TU:VWX:YZ")) != -1) {
 		switch (c) {
 		case '0':			/* print version string */
 			printf("sock:  version %s\n", VERSION);
@@ -118,6 +119,11 @@ main(int argc, char *argv[])
 
 		case 'c':			/* convert newline to CR/LF & vice versa */
 			crlf = 1;
+			break;
+
+		case 'e':			/* IPv6 flow label option */
+			/* 1 if optarg non-zero, else 0 */
+			flowlabel_option = !!atol(optarg);
 			break;
 
 		case 'f':			/* foreign IP address and port#: a.b.c.d.p */
@@ -409,6 +415,7 @@ usage(const char *msg)
 "       sock [ options ] -i -s [ <IPaddr> ] <port>  (for \"sink\" server)\n"
 "options: -b n  bind n as client's local port number\n"
 "         -c    convert newline to CR/LF & vice versa\n"
+"         -e n  enable (n=1) or disable (n=0) IPv6 header flow label\n"
 "         -f a.b.c.d.p  foreign IP address = a.b.c.d, foreign port# = p\n"
 "         -g a.b.c.d  loose source route\n"
 "         -h    issue TCP half close on standard input EOF\n"
