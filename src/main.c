@@ -335,6 +335,9 @@ main(int argc, char *argv[])
 	if ((AF_INET6 == af_46) && sroute_option) {
 		usage("can't specify -g or -G with IPv6");
 	}
+	if ((AF_INET == af_46) && (-1 != flowlabel_option)) {
+		usage("can't specify -e with IPv4");
+	}
 	if (l4_prot != L4_PROT_TCP && halfclose)
 		usage("can't specify -h and -u");
 	if (l4_prot != L4_PROT_TCP && debug)
@@ -355,18 +358,20 @@ main(int argc, char *argv[])
 			usage("missing <hostname> and/or <port>");
 		host = argv[optind];
 		port = argv[optind+1];
-
 	} else {
-			/* If server specifies host and port, then local address is
-			   bound to the "host" argument, instead of being wildcarded. */
+		/*
+		 * If server specifies host and port, then local address is
+		 * bound to the "host" argument, instead of being wildcarded.
+		 */
 		if (optind == argc-2) {
 			host = argv[optind];
 			port = argv[optind+1];
 		} else if (optind == argc-1) {
 			host = NULL;
 			port = argv[optind];
-		} else
+		} else {
 			usage("missing <port>");
+		}
 	}
 
 	if (client)
