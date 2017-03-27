@@ -86,6 +86,7 @@ extern char		foreignip[];
 extern int		foreignport;
 extern int		halfclose;
 extern int		ignorewerr;
+extern int		ip_dontfrag;
 extern int		iptos;
 extern int		ipttl;
 extern char		joinip[];

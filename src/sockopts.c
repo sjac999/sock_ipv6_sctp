@@ -81,7 +81,7 @@ sockopts(int sockfd, int doall)
 	}
 	
 #ifdef	IP_TOS
-	if (iptos != -1 && doall == 0) {
+	if ((-1 != iptos) && (0 == doall)) {
 		if (IPPROTO_IP == l3_prot) {
 			if (setsockopt(sockfd, l3_prot, IP_TOS,
 				    &iptos, sizeof(iptos)) < 0) {
@@ -125,7 +125,7 @@ sockopts(int sockfd, int doall)
 #endif
 	
 #ifdef	IP_TTL
-	if (ipttl != -1 && doall == 0) {
+	if ((-1 != ipttl) && (0 == doall)) {
 		if (IPPROTO_IP == l3_prot) {
 			/* Set IPv4 TTL */
 			if (setsockopt(sockfd, l3_prot, IP_TTL,
@@ -171,6 +171,55 @@ sockopts(int sockfd, int doall)
 		}
 	}
 #endif
+
+	if ((-1 != ip_dontfrag) && (0 == doall)) {
+		if (IPPROTO_IP == l3_prot) {
+			/* Set the IPv4 DF (don't fragment) bit */
+			if (setsockopt(sockfd, l3_prot, IP_DONTFRAG,
+				    &ip_dontfrag, sizeof(ip_dontfrag)) < 0) {
+				err_sys("IPv4 IP_DONTFRAG setsockopt error");
+			}
+			option = 0;
+			optlen = sizeof(option);
+			if (getsockopt(sockfd, l3_prot, IP_DONTFRAG,
+				    &option, &optlen) < 0) {
+				err_sys("IPv4 IP_DONTFRAG getsockopt error");
+			}
+			if (option != ip_dontfrag) {
+				err_quit("IPv4 IP_DONTFRAG not set (%d)",
+				    option);
+			}
+			if (verbose) {
+				fprintf(stderr, "IPv4 IP_DONTFRAG set to %d\n",
+				    ip_dontfrag);
+			}
+		} else {
+			/*
+			 * Disable IPv6 fragmentation
+			 * Prevents the socket from fragmenting an oversized
+			 * packet; write() returns an error instead.
+			 */
+			if (setsockopt(sockfd, l3_prot, IPV6_DONTFRAG,
+				    &ip_dontfrag, sizeof(ip_dontfrag)) < 0) {
+				err_sys("IPv6 IPV6_DONTFRAG setsockopt error");
+			}
+			option = 0;
+			optlen = sizeof(option);
+			if (getsockopt(sockfd, l3_prot, IPV6_DONTFRAG,
+				    &option, &optlen) < 0) {
+				err_sys("IPv6 IPV6_DONTFRAG getsockopt error");
+			}
+			if (option != ip_dontfrag) {
+				err_quit("IPv6 IPV6_DONTFRAG not set (%d)",
+				    option);
+			}
+			if (verbose) {
+				fprintf(stderr,
+				    "IPv6 IPV6_DONTFRAG set to %d\n",
+				    ip_dontfrag);
+			}
+		}
+	}
 
 	if ((-1 != flowlabel_option) && (AF_INET6 == af_46)) {
 		/*

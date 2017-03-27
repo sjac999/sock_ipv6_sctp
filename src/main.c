@@ -41,6 +41,7 @@ char		foreignip[32];			/* foreign IP address, dotted-decimal string */
 int		foreignport;			/* foreign port number */
 int		halfclose;			/* TCP half close option */
 int		ignorewerr;			/* true if write() errors should be ignored */
+int		ip_dontfrag = -1;		/* IPv4 DF/IPv6 don't fragment */
 int		iptos = -1;			/* IP_TOS/IPV6_TCLASS option */
 int		ipttl = -1;			/* IP_TTL/IPV6_MULTICAST_HOPS option */
 char		joinip[32];			/* multicast IP address, dotted-decimal string */
@@ -94,7 +95,7 @@ main(int argc, char *argv[])
 		usage("");
 
 	opterr = 0;		/* don't want getopt() writing to stderr */
-	while ( (c = getopt(argc, argv, "0256b:ce:f:g:hij:kl:n:op:q:r:st:uvw:x:y:ABCDEFG:H:IJ:KL:NO:P:Q:R:S:TU:VWX:YZ")) != -1) {
+	while ( (c = getopt(argc, argv, "0256b:cde:f:g:hij:kl:n:op:q:r:st:uvw:x:y:ABCDEFG:H:IJ:KL:NO:P:Q:R:S:TU:VWX:YZ")) != -1) {
 		switch (c) {
 		case '0':			/* print version string */
 			printf("sock:  version %s\n", VERSION);
@@ -119,6 +120,10 @@ main(int argc, char *argv[])
 
 		case 'c':			/* convert newline to CR/LF & vice versa */
 			crlf = 1;
+			break;
+
+		case 'd':			/* Set DF/don't fragment */
+			ip_dontfrag = 1;
 			break;
 
 		case 'e':			/* IPv6 flow label option */
