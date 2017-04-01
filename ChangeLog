@@ -1,3 +1,14 @@
+Sat Apr  1 14:24:38 PDT 2017
+
+  - Updated Version to 0.4.2 to reflect the addition new socket
+    options.
+
+  - Added IPv6 socket options:  Set hop limit; set multicast hop limit;
+    disable/enable header flow label; set header traffic class; set don't
+    fragment option.
+
+  - Added IPv4 socket option:  Set DF (don't fragment) header bit.
+
 Sun Mar  5 18:38:01 PST 2017
 
   - Changed Version to 0.4.1 to reflect the addition of SCTP

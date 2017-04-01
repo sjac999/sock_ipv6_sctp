@@ -27,14 +27,8 @@ I do not give build support etc.
 
 Notes from Steve Jacobson:
 
-This FreeBSD port is built on top of the original 0.3.2 tarball from
-2010, above, downloaded from the icir.org webpage.
-
-Version 0.4.0 notes:
-
-The version of this sock program has been updated to 0.4.0 to reflect
-the IPv6 changes.  This version also includes a run-time version option
-and better documentation.
+These enhanced versions of sock are derived from the original 0.3.2
+tarball from 2010, above, downloaded from the icir.org webpage.
 
 The sock program can generate various UDP and TCP packets with various
 options.  It can also be run as a client or as a server.
@@ -42,23 +36,22 @@ options.  It can also be run as a client or as a server.
 Beyond educational uses, this program can be used in many different
 networking contexts to generate test packets.
 
-In addition to the previously existing capabilities of "sock," this port
+
+Version 0.4.0 notes:
+
+The sock program has been updated to 0.4.0 to reflect the IPv6 changes.
+This version also includes a version command and better documentation.
+
+In addition to the previously existing capabilities of "sock," this version
 has an IPv6 option that allows TCP or UDP to be sent over IPv6, or over
 the default IPv4.
 
-This port also fixes a couple of bugs in Christian Kreibich's version;
-fixes are documented in the source code.
-
-Testing with this program shows that a number of socket options that
-are supported for IPv4 are not supported for IPv6.  it is unclear if
-anyone is concerned about this in practice.
+This port also fixes a couple of bugs in version 0.3.2 of the sock program.
+Fixes are documented in the source code.  All compile warnings from that
+version have also been fixed.
 
 This port was tested on FreeBSD 8.4, i386; and, FreeBSD 10.2, amd64.
 
-The license is generic educational on all the source files.  Only one
-file mentions "GPL"; that is sock.spec, the RPM spec file, which was
-added later by a Linux person.  The FreeBSD port should not need that
-file.
 
 Version 0.4.1 notes:
 
@@ -68,6 +61,17 @@ SCTP can now be chosen as a layer 4 protocol, as an alternative to
 UDP and the default TCP.
 
 This port was tested on FreeBSD 8.4, i386; and, FreeBSD 10.2, amd64.
+
+
+Version 0.4.2 notes:
+
+Added IPv6 socket options:  Set hop limit; set multicast hop limit;
+disable/enable header flow label; set header traffic class; set don't
+fragment option.
+
+Added IPv4 socket option:  Set DF (don't fragment) header bit.
+
+This port was tested on FreeBSD 10.2, amd64.
 
 
 Build and installation notes:

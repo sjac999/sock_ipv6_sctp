@@ -6,7 +6,7 @@ dnl Make sure that we're in the right directory by looking for ipgrab.c
 AC_INIT(src/main.c)
 
 dnl set up for automake
-AM_INIT_AUTOMAKE(sock,0.4.1.6)
+AM_INIT_AUTOMAKE(sock,0.4.2)
 
 dnl set up automake header file
 AM_CONFIG_HEADER(config.h)
