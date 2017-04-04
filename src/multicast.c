@@ -51,20 +51,28 @@ join_mcast_server(int fd, struct sockaddr_in *sin, struct sockaddr_in6 *sin6)
 		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 		if (setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq,
 		    sizeof(mreq)) == -1 ) {
-			err_sys("IP_ADD_MEMBERSHIP error");
+			err_sys("IP46 IP_ADD_MEMBERSHIP error");
 		}
 	} else {
 		memset((char *)&mreq6, 0, sizeof(mreq6));
+// Fixme
+// Fixme
+// Fixme
+		/* Pick an appropriate interface */
+		mreq6.ipv6mr_interface = 0;
 		mreq6.ipv6mr_multiaddr = sin6->sin6_addr;
-		mreq6.ipv6mr_interface = sin6->sin6_scope_id;
+// Fixme
+// Fixme
+// Fixme
+		//mreq6.ipv6mr_interface = sin6->sin6_scope_id;
 		if (setsockopt(fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &mreq6,
 		    sizeof(mreq6)) == -1 ) {
-			err_sys("IP_ADD_MEMBERSHIP error");
+			err_sys("IPv6 IPV6_JOIN_GROUP error");
 		}
 	}
-
-	if (verbose)
+	if (verbose) {
 		fprintf(stderr, "multicast group joined\n");
+	}
 #endif	/* IP_ADD_MEMBERSHIP */
 }
 
@@ -90,11 +98,19 @@ join_mcast_client(int fd,
 
 	if (af_46 == AF_INET6) {
 		memset((char *)&mreq6, 0, sizeof(mreq6));
+// Fixme
+// Fixme
+// Fixme
+		/* Pick an appropriate interface */
+		mreq6.ipv6mr_interface = 0;
 		mreq6.ipv6mr_multiaddr = serv_sin6->sin6_addr;
-		mreq6.ipv6mr_interface = serv_sin6->sin6_scope_id;
+// Fixme
+// Fixme
+// Fixme
+		//mreq6.ipv6mr_interface = serv_sin6->sin6_scope_id;
 		if (setsockopt(fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &mreq6,
 		    sizeof(mreq6)) == -1 ) {
-			err_sys("IP_ADD_MEMBERSHIP error");
+			err_sys("IPv6 IPV6_JOIN_GROUP error");
 		}
 	}
 

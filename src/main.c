@@ -37,14 +37,14 @@ int		debug;				/* SO_DEBUG */
 int		dofork;				/* concurrent server, do a fork() */
 int		dontroute;			/* SO_DONTROUTE */
 int		flowlabel_option = -1;		/* IPv6 flow label option */
-char		foreignip[32];			/* foreign IP address, dotted-decimal string */
+char		foreignip[INET6_ADDRSTRLEN];	/* foreign IP address, dotted-decimal string */
 int		foreignport;			/* foreign port number */
 int		halfclose;			/* TCP half close option */
 int		ignorewerr;			/* true if write() errors should be ignored */
 int		ip_dontfrag = -1;		/* IPv4 DF/IPv6 don't fragment */
 int		iptos = -1;			/* IP_TOS/IPV6_TCLASS option */
 int		ipttl = -1;			/* IP_TTL/IPV6_MULTICAST_HOPS option */
-char		joinip[32];			/* multicast IP address, dotted-decimal string */
+char		joinip[INET6_ADDRSTRLEN];	/* multicast IP address, dotted-decimal string */
 int		keepalive;			/* SO_KEEPALIVE */
 long		linger = -1;			/* 0 or positive turns on option */
 int		listenq = 5;			/* listen queue for TCP Server */
@@ -132,12 +132,12 @@ main(int argc, char *argv[])
 			break;
 
 		case 'f':			/* foreign IP address and port#: a.b.c.d.p */
-			if ( (ptr = strrchr(optarg, '.')) == NULL)
+			if ( (ptr = strrchr(optarg, '.')) == NULL) {
 				usage("invalid -f option");
-
-			*ptr++ = 0;					/* null replaces final period */
+			}
+			*ptr++ = 0;		/* NUL replaces final period */
 			foreignport = atoi(ptr);	/* port number */
-			strcpy(foreignip, optarg);	/* save dotted-decimal IP */
+			strcpy(foreignip, optarg);	/* dotted-decimal IP */
 			break;
 
 		case 'g':			/* loose source route */
@@ -345,19 +345,20 @@ main(int argc, char *argv[])
 		usage("can't specify -e with IPv4");
 	}
 	if (l4_prot != L4_PROT_TCP && halfclose)
-		usage("can't specify -h and -u");
+		usage("can't specify -h with -u or -5");
 	if (l4_prot != L4_PROT_TCP && debug)
-		usage("can't specify -D and -u");
+		usage("can't specify -D with -u or -5");
 	if (l4_prot != L4_PROT_TCP && linger >= 0)
-		usage("can't specify -L and -u");
+		usage("can't specify -L with -u or -5");
 	if (l4_prot != L4_PROT_TCP && nodelay)
-		usage("can't specify -N and -u");
+		usage("can't specify -N with -u or -5");
 #ifdef	notdef
 	if (l4_prot == L4_PROT_TCP && broadcast)
 		usage("can't specify -B with TCP");
 #endif
-	if (l4_prot == L4_PROT_TCP && foreignip[0] != 0)
-		usage("can't specify -f with TCP");
+	if ((L4_PROT_UDP != l4_prot) && (0 != foreignip[0])) {
+		usage("can't specify -f with TCP or SCTP");
+	}
 
 	if (client) {
 		if (optind != argc-2)

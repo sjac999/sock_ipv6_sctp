@@ -130,25 +130,48 @@ servopen(char *host, char *port)
 
 	join_mcast_server(fd, &servaddr4, &servaddr6);
 
-	// Fixme:  What about SCTP?
-	if (l4_prot == L4_PROT_UDP) {
+	/*
+	 * UDP:  Connect to foreign IPv4/IPv6 address and foreign port,
+	 * if specified.
+	 */
+	if ((L4_PROT_UDP == l4_prot) && (0 != foreignip[0])) {
 		buffers(fd);
 
-		/* Fixme:  Not ported for IPv6 */
-		if (foreignip[0] != 0) {    /* connect to foreignip/port# */
+		if (AF_INET == af_46) {
 			bzero(&cliaddr4, sizeof(cliaddr4));
-			if (inet_aton(foreignip, &cliaddr4.sin_addr) == 0)
-				err_quit("invalid IP address: %s", foreignip);
+			if (inet_pton(AF_INET, foreignip,
+				    &cliaddr4.sin_addr) != 1) {
+				err_quit("invalid IPv4 address: %s", foreignip);
+			}
 			cliaddr4.sin_family = AF_INET;
 			cliaddr4.sin_port   = htons(foreignport);
-			/* connect() for datagram socket doesn't appear to allow
-			   wildcarding of either IP address or port number */
-
+			/*
+			 * connect() for datagram socket doesn't appear
+			 * to allow wildcarding of either IPv4 address or
+			 * port number
+			 */
 			if (connect(fd, (struct sockaddr *) &cliaddr4,
-			    sizeof(cliaddr4)) < 0)
-				err_sys("connect() error");
-		}
+			    sizeof(cliaddr4)) < 0) {
+				err_sys("IPv4 connect() error");
+			}
+		} else {
+			bzero(&cliaddr6, sizeof(cliaddr6));
+			if (inet_pton(AF_INET6, foreignip,
+				    &cliaddr6.sin6_addr) != 1) {
+				err_quit("invalid IPv6 address: %s", foreignip);
+			}
+			cliaddr6.sin6_len = sizeof(struct sockaddr_in6);
+			cliaddr6.sin6_family = AF_INET6;
+			cliaddr6.sin6_port   = htons(foreignport);
 
+			if (connect(fd, (struct sockaddr *) &cliaddr6,
+			    sizeof(cliaddr6)) < 0) {
+				err_sys("IPv6 connect() error");
+			}
+		}
+	}
+
+	if (L4_PROT_UDP == l4_prot) {
 		sockopts(fd, 1);
 
 		return(fd);		/* nothing else to do */

@@ -309,18 +309,42 @@ sockopts(int sockfd, int doall)
 	}
 	
 #ifdef	IP_ADD_MEMBERSHIP
-	if (joinip[0]) {
-		struct ip_mreq	join;
+	if (joinip[0] && (doall == 1)) {
+		if (IPPROTO_IP == l3_prot) {
+			struct ip_mreq	mreq4;
 		
-		if (inet_aton(joinip, &join.imr_multiaddr) == 0)
-			err_quit("invalid multicast address: %s", joinip);
-		join.imr_interface.s_addr = htonl(INADDR_ANY);
-		if (setsockopt(sockfd, l3_prot, IP_ADD_MEMBERSHIP,
-			       &join, sizeof(join)) < 0)
-			err_sys("IP_ADD_MEMBERSHIP setsockopt error");
-		
-		if (verbose)
-			fprintf(stderr, "IP_ADD_MEMBERSHIP set\n");
+			if (inet_pton(AF_INET, joinip,
+				    &mreq4.imr_multiaddr) != 1) {
+				err_quit("IPv4:  invalid multicast address: %s",
+				    joinip);
+			}
+			mreq4.imr_interface.s_addr = htonl(INADDR_ANY);
+			if (setsockopt(sockfd, l3_prot, IP_ADD_MEMBERSHIP,
+				    &mreq4, sizeof(mreq4)) < 0) {
+				err_sys(
+				    "IPv4 IP_ADD_MEMBERSHIP setsockopt error");
+			}
+			if (verbose) {
+				fprintf(stderr, "IPv4 IP_ADD_MEMBERSHIP set\n");
+			}
+		} else {
+			struct ipv6_mreq mreq6;
+
+			if (inet_pton(AF_INET6, joinip,
+				    &mreq6.ipv6mr_multiaddr) == 0) {
+				err_quit("IPv6:  invalid multicast address: %s",
+				    joinip);
+			}
+			mreq6.ipv6mr_interface = 0;
+			if (setsockopt(sockfd, l3_prot, IPV6_JOIN_GROUP,
+				    &mreq6, sizeof(mreq6)) < 0) {
+				err_sys(
+				    "IPv6 IPV6_JOIN_GROUP setsockopt error");
+			}
+			if (verbose) {
+				fprintf(stderr, "IPv6 IPV6_JOIN_GROUP set\n");
+			}
+		}
 	}
 #endif
 	

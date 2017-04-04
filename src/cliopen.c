@@ -154,7 +154,6 @@ int cliopen(char *host, char *port)
 	 * Also, for experimentation, client can also set local IP address
 	 * (and port) using -l option.  Allow localip[] to be set but bindport
 	 * to be 0.
-	 * Fixme:  What about SCTP?
 	 */
 	if (bindport != 0 || localip[0] != 0 || l4_prot == L4_PROT_UDP) {
 		if (af_46 == AF_INET) {
@@ -181,7 +180,7 @@ int cliopen(char *host, char *port)
 			/* can be 0 */
 			cliaddr6.sin6_port   = htons(bindport);
 
-			/* Fixme:  localip not implemented for IPv6 */
+			/* Note:  localip not implemented for IPv6 */
 			cliaddr6.sin6_addr = in6addr_any;
 
 			if (bind(fd, (struct sockaddr *) &cliaddr6,
