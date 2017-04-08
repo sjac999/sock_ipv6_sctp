@@ -51,7 +51,7 @@ join_mcast_server(int fd, struct sockaddr_in *sin, struct sockaddr_in6 *sin6)
 		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 		if (setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq,
 		    sizeof(mreq)) == -1 ) {
-			err_sys("IP46 IP_ADD_MEMBERSHIP error");
+			err_sys("IPv4 IP_ADD_MEMBERSHIP error");
 		}
 	} else {
 		memset((char *)&mreq6, 0, sizeof(mreq6));

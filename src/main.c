@@ -167,9 +167,9 @@ main(int argc, char *argv[])
 			if ( (ptr = strrchr(optarg, '.')) == NULL)
 				usage("invalid -l option");
 
-			*ptr++ = 0;					/* null replaces final period */
-			bindport = atoi(ptr);		/* port number */
-			strcpy(localip, optarg);	/* save dotted-decimal IP */
+			*ptr++ = 0;		/* NUL replaces final period */
+			bindport = atoi(ptr);	 /* port number */
+			strcpy(localip, optarg); /* save dotted-decimal IP */
 			break;
 
 		case 'n':			/* number of buffers to write */
@@ -212,6 +212,7 @@ main(int argc, char *argv[])
 			break;
 
 		case 'w':			/* write() length */
+			/* -w 9216 is the maximum for FreeBSD 10.2 */
 			writelen = atoi(optarg);
 			break;
 

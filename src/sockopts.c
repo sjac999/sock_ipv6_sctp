@@ -309,7 +309,8 @@ sockopts(int sockfd, int doall)
 	}
 	
 #ifdef	IP_ADD_MEMBERSHIP
-	if (joinip[0] && (doall == 1)) {
+	// Fixme:  Should doall be 0 or 1?
+	if (joinip[0] && (doall == 0)) {
 		if (IPPROTO_IP == l3_prot) {
 			struct ip_mreq	mreq4;
 		
