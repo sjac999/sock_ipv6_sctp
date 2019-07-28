@@ -2291,7 +2291,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=sock
- VERSION=0.4.2.1
+ VERSION=0.4.3.1
 
 
 cat >>confdefs.h <<_ACEOF
