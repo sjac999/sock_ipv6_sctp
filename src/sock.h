@@ -89,6 +89,8 @@ extern int		ignorewerr;
 extern int		ip_dontfrag;
 extern int		iptos;
 extern int		ipttl;
+extern int		ipv6_num_dstopts;
+extern int		ipv6_num_hopopts;
 extern char		joinip[];
 extern int		keepalive;
 extern long		linger;
@@ -162,6 +164,9 @@ void	sroute_set(int);
 void	sleep_us(unsigned int);
 void	sockopts(int, int);
 ssize_t	dowrite(int, const void *, size_t);
+int	ipv6_set_hopopts_ext_hdr(int fd, int num_hdr_opts);
+int	ipv6_set_dstopts_ext_hdr(int fd, int num_hdr_opts);
+int	ipv6_set_rthdrs_ext_hdr(int fd, int num_hdr_opts);
 
 void	TELL_WAIT(void);
 void	TELL_PARENT(pid_t);
@@ -176,3 +181,4 @@ void	 err_ret(const char *, ...);
 void	 err_sys(const char *, ...);
 
 ssize_t	 writen(int, const void *, size_t);
+

@@ -31,6 +31,7 @@ sockopts(int sockfd, int doall)
 	struct linger	ling;
 	struct timeval	timer;
 	int 		l3_prot;
+	int 		rc;
 
 	if (AF_INET == af_46) {
 		l3_prot = IPPROTO_IP;
@@ -554,6 +555,30 @@ sockopts(int sockfd, int doall)
 #else
 		fprintf(stderr, "warning: FIOASYNC not supported by host\n");
 #endif
+	}
+
+	/*
+	 * IPv6 hop-by-hop options extension header
+	 */
+	if ((doall == 1) && (ipv6_num_hopopts != -1)) {
+		rc = ipv6_set_hopopts_ext_hdr(sockfd, ipv6_num_hopopts);
+		if (rc != 0) {
+			fprintf(stderr, "IPv6 HOPOPTS error %d\n", rc);
+		} else if (verbose) {
+			fprintf(stderr, "IPv6 HOPOPTS set\n");
+		}
+	}
+
+	/*
+	 * IPv6 destination options extension header
+	 */
+	if ((doall == 1) && (ipv6_num_dstopts != -1)) {
+		rc = ipv6_set_dstopts_ext_hdr(sockfd, ipv6_num_dstopts);
+		if (rc != 0) {
+			fprintf(stderr, "IPv6 DSTOPTS error %d\n", rc);
+		} else if (verbose) {
+			fprintf(stderr, "IPv6 DSTOPTS set\n");
+		}
 	}
 }
 

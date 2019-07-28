@@ -44,6 +44,8 @@ int		ignorewerr;			/* true if write() errors should be ignored */
 int		ip_dontfrag = -1;		/* IPv4 DF/IPv6 don't fragment */
 int		iptos = -1;			/* IP_TOS/IPV6_TCLASS option */
 int		ipttl = -1;			/* IP_TTL/IPV6_MULTICAST_HOPS option */
+int		ipv6_num_dstopts = -1;		/* IPv6 ext hdr # dstopts */
+int		ipv6_num_hopopts = -1;		/* IPv6 ext hdr # hopopts */
 char		joinip[INET6_ADDRSTRLEN];	/* multicast IP address, dotted-decimal string */
 int		keepalive;			/* SO_KEEPALIVE */
 long		linger = -1;			/* 0 or positive turns on option */
@@ -95,11 +97,15 @@ main(int argc, char *argv[])
 		usage("");
 
 	opterr = 0;		/* don't want getopt() writing to stderr */
-	while ( (c = getopt(argc, argv, "0256b:cde:f:g:hij:kl:n:op:q:r:st:uvw:x:y:ABCDEFG:H:IJ:KL:NO:P:Q:R:S:TU:VWX:YZ")) != -1) {
+	while ( (c = getopt(argc, argv, "01:2569:b:cde:f:g:hij:kl:n:op:q:r:st:uvw:x:y:ABCDEFG:H:IJ:KL:NO:P:Q:R:S:TU:VWX:YZ")) != -1) {
 		switch (c) {
 		case '0':			/* print version string */
 			printf("sock:  version %s\n", VERSION);
 			return (0);
+
+		case '1':			/* IPv6 ext hdr # of HOPOPTS */
+			ipv6_num_hopopts = atoi(optarg);
+			break;
 
 #ifdef	IP_ONESBCAST
 		case '2':			/* use 255.255.255.255 as broadcast address */
@@ -112,6 +118,10 @@ main(int argc, char *argv[])
 
 		case '6':			/* use IPv6 */
 			af_46 = AF_INET6;
+			break;
+
+		case '9':			/* IPv6 ext hdr # of HOPOPTS */
+			ipv6_num_dstopts = atoi(optarg);
 			break;
 
 		case 'b':
@@ -342,6 +352,10 @@ main(int argc, char *argv[])
 	if ((AF_INET6 == af_46) && sroute_option) {
 		usage("can't specify -g or -G with IPv6");
 	}
+	if ((AF_INET6 != af_46) && 
+	    ((-1 != ipv6_num_hopopts) || (-1 != ipv6_num_dstopts))) {
+		usage("can only specify -1 or -9 with IPv6");
+	}
 	if ((AF_INET == af_46) && (-1 != flowlabel_option)) {
 		usage("can't specify -e with IPv4");
 	}
@@ -485,11 +499,13 @@ usage(const char *msg)
 "         -Y    SO_DONTROUTE option\n"
 "         -Z    MSG_PEEK\n"
 "         -0    print version string\n"
+"         -1 n  IPv6:  specify # of hop-by-hop options extension headers\n"
 #ifdef	IP_ONESBCAST
 "         -2    IP_ONESBCAST option (255.255.255.255 for broadcast)\n"
 #endif
 "         -5    use SCTP instead of TCP or UDP\n"
 "         -6    use IPv6 instead of IPv4\n"
+"         -9 n  IPv6:  specify # of destination options extension headers\n"
 );
 
 	if (msg[0] != 0)
