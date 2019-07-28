@@ -53,7 +53,8 @@ am_sock_OBJECTS = buffers.$(OBJEXT) cliopen.$(OBJEXT) crlf.$(OBJEXT) \
 	sourceroute.$(OBJEXT) sourcetcp.$(OBJEXT) sourceudp.$(OBJEXT) \
 	sinktcp.$(OBJEXT) sinkudp.$(OBJEXT) tellwait.$(OBJEXT) \
 	write.$(OBJEXT) writen.$(OBJEXT) \
-	loopsctp.$(OBJEXT) sinksctp.$(OBJEXT) sourcesctp.$(OBJEXT)
+	loopsctp.$(OBJEXT) sinksctp.$(OBJEXT) sourcesctp.$(OBJEXT) \
+	ipv6_opt_hdrs.$(OBJEXT)
 sock_OBJECTS = $(am_sock_OBJECTS)
 sock_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -161,7 +162,7 @@ sock_SOURCES = \
 	loopudp.c main.c multicast.c pattern.c servopen.c \
 	sleepus.c sockopts.c sourceroute.c sourcetcp.c \
 	sourceudp.c sinktcp.c sinkudp.c tellwait.c write.c writen.c \
-	loopsctp.c sinksctp.c sourcesctp.c
+	loopsctp.c sinksctp.c sourcesctp.c ipv6_opt_hdrs.c
 
 AM_CFLAGS = -Wall -Wstrict-prototypes -g -O2
 all: all-am
@@ -268,6 +269,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loopsctp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sinksctp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sourcesctp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ipv6_opt_hdrs.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
