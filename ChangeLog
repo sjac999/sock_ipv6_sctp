@@ -1,3 +1,16 @@
+Sat Jul 27 15:58:32 PDT 2019
+
+  - Updated Version to 0.4.3.1 to reflect the addition new IPv6
+    extension header options.
+
+  - Added -1 command line option to allow insertion of a hop-by-hop
+    options IPv6 extension header, containing the specified number of
+    options.
+
+  - Added -9 command line option to allow insertion of a destination
+    options IPv6 extension header, containing the specified number of
+    options.
+
 Sat Apr  1 14:24:38 PDT 2017
 
   - Updated Version to 0.4.2 to reflect the addition new socket

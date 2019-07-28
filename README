@@ -74,6 +74,15 @@ Added IPv4 socket option:  Set DF (don't fragment) header bit.
 This port was tested on FreeBSD 10.2, amd64.
 
 
+Version 0.4.3.1 notes:
+
+Added IPv6 extension header options.  It is now possible to add IPv6
+hop-by-hop options and/or destination options extension headers to
+transmitted IPv6 packets.
+
+This software was tested on FreeBSD 11.2, amd64.
+
+
 Build and installation notes:
 
 David Morgan of the Computer Science Department at Santa Monica College
@@ -130,4 +139,18 @@ These build issues were noted on FreeBSD 8.4
     Fix:
       cd sock/src
       rm config.h
+
+This build issue was noted on FreeBSD 11.2
+
+3.  make fails with the following error:
+
+    /bin/sh: automake-1.11: not found
+    *** Error code 127
+
+    Issue:  This indicates that the access date on file configure.in
+    is too new relative to certain other files.
+
+    Fix:  
+      cd sock
+      touch *
 
